@@ -1,0 +1,22 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["standard", "plugin:vue/vue3-essential", "prettier"],
+  "overrides": [],
+  "parser": "vue-eslint-parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["vue"],
+  "rules": {
+    "comma-dangle": "off",
+    "semi": "off",
+    "no-unused-vars": "off",
+    "space-before-function-paren": "off",
+    "vue/multi-word-component-names": "off"
+  }
+}

@@ -1,0 +1,48 @@
+services:
+  client:
+    build:
+      context: .
+      dockerfile: ./infra/docker/client/Dockerfile
+    volumes:
+      - ./src/client:/opt/app
+    profiles:
+      - dev
+    command: npm run dev
+    ports:
+      - ${VITE_HOST_PORT:-5173}:5173
+  db:
+    build:
+      context: .
+      dockerfile: ./infra/docker/db/Dockerfile
+    volumes:
+      - db-store:/var/lib/mysql
+    ports:
+      - ${DB_HOST_PORT:-13306}:3306
+    environment:
+      - MARIADB_USER=${DB_USERNAME:-dashboard}
+      - MARIADB_PASSWORD=${DB_PASSWORD:-secret}
+      - MARIADB_DATABASE=${DB_NAME:-dashboard}
+      - MARIADB_ROOT_PASSWORD=maria
+      - TZ=Asia/Tokyo
+  server:
+    build:
+      context: .
+      dockerfile: ./infra/docker/server/Dockerfile
+    volumes:
+      - ./src/server:/opt/app
+    depends_on:
+      - db
+    expose:
+      - "8000"
+    command: uwsgi --socket :8000 --module app.wsgi
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./infra/docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./infra/docker/nginx/uwsgi_params:/etc/nginx/uwsgi_params
+    depends_on:
+      - server
+    ports:
+      - ${SERVER_HOST_PORT:-8000}:80
+volumes:
+  db-store:
